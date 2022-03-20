@@ -68,6 +68,7 @@ public class QRCodeDisplayController : MonoBehaviour
         if (lastSeenCode?.Data != codeReceived.Data)
         {
             displayText.text = $"code observed: {codeReceived.Data}";
+
             if (confirmSound.clip != null)
             {
                 confirmSound.Play();

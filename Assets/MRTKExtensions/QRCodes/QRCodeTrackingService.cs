@@ -86,8 +86,11 @@ namespace MRTKExtensions.QRCodes
             }
         }
 
-        private void SetupTracking()
+        private async void SetupTracking()
         {
+            // Needs to be called before creating a QRCodeWatcher
+            await QRCodeWatcher.RequestAccessAsync();
+
             qrTracker = new QRCodeWatcher();
             qrTracker.Updated += QRCodeWatcher_Updated;
             IsInitialized = true;

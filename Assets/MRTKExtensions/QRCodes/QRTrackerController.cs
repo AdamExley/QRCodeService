@@ -12,6 +12,8 @@ namespace MRTKExtensions.QRCodes
         [SerializeField]
         private string locationQrValue = string.Empty;
 
+        private TimeSpan lastDetectedSpan; // Add update limits in editor
+
         private Transform markerHolder;
         private AudioSource audioSource;
         private GameObject markerDisplay;
@@ -81,17 +83,20 @@ namespace MRTKExtensions.QRCodes
 
         private void ProcessTrackingFound(object sender, QRInfo msg)
         {
-            if (msg == null || !IsTrackingActive )
-            {
-                return;
-            }
+            // Would jump on this line
+            //if (msg == null || !IsTrackingActive )
+            //{
+            //    return;
+            //}
 
             lastMessage = msg;
 
-            if (msg.Data == locationQrValue && Math.Abs((DateTimeOffset.UtcNow - msg.LastDetectedTime.UtcDateTime).TotalMilliseconds) < 200)
+            // Limit pose updating to once every 500 millis
+            if (msg.Data == locationQrValue && ((msg.SystemRelativeLastDetectedTime - lastDetectedSpan).TotalMilliseconds > 500))
             {
-                spatialGraphCoordinateSystemSetter.SetLocationIdSize(msg.SpatialGraphNodeId,
-                    msg.PhysicalSideLength);
+                lastDetectedSpan = msg.SystemRelativeLastDetectedTime;
+
+                spatialGraphCoordinateSystemSetter.SetLocationIdSize(msg.SpatialGraphNodeId,msg.PhysicalSideLength);
             }
         }
 
